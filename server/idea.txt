@@ -1,0 +1,3 @@
+for the time of deployment we use node not nodemom
+
+always remember env and package.json are on same root directory..
