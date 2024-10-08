@@ -1,8 +1,42 @@
-import { Button, Label, TextInput } from 'flowbite-react'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Alert, Button, Label, TextInput } from 'flowbite-react'
+import React, { useState } from 'react'
+import { Link , useNavigate} from 'react-router-dom'
 
 function SignUp() {
+  const [formData, setFormData] = useState({});
+  const [errorMessage, setErrorMessage]=useState(null);
+  const navigate= useNavigate();
+  const handleChange= (e)=>{
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim()});
+  }
+  
+  const handleSubmit= async (e) =>{
+    e.preventDefault(); {/* for stopping auto refreshing of page on clicking Signup*/}
+
+    // if someone left field empty
+    if(!formData.username || !formData.email || !formData.password){
+      return setErrorMessage("Please Fill Out All the Fields !!");
+    }
+    try {
+      setErrorMessage(null);  // maybe error from previous message
+      const res= await fetch('/api/signup', {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(formData),
+      })
+
+      const data= await res.json();
+      if(data.success=== false){
+        return setErrorMessage(data.Message);
+      }
+
+      if(res.ok){
+        navigate('/sign-in');
+      }
+    } catch (error) {
+      console.error("Error during sign-up:", error.message || error);
+    }
+  }
   return (
     <div className='min-h-screen mt-20'>
       <div className='flex p-3 max-w-3xl mx-auto flex-col md:flex-row md: items-center gap-5'>
@@ -15,39 +49,42 @@ function SignUp() {
           </span>
         </Link>
         <p className='text-sm mt-5'>
-          <b>नमस्कार! 🙏  Welcome to BlogiFy!</b>
-          Discover a world of stories, ideas, and inspiration.
+          <b>नमस्कार! 🙏  Welcome to BlogiFy! </b>
+          Dive in the world of stories, ideas, and inspiration.
         </p>
         </div>
 
         {/* for right side */}
         <div className='flex-1'>
-          <form className='flex flex-col gap-4'>
+          <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
              <div >    {/*for username */}
               <Label value='UserName' />
               <TextInput
                 type="text"
                 placeholder='Example Name'
                 id='username'
+                onChange={handleChange}
                 />
             </div>
              <div >    {/*for Email */}
               <Label value='E-mail' />
               <TextInput
-                type="text"
+                type="email"
                 placeholder='example@gmail.com'
                 id='email'
+                onChange={handleChange}
                 />
             </div>
              <div >    {/*for Password */}
               <Label value='Password' />
               <TextInput
-                type="text"
-                placeholder='######'
+                type="password"
+                placeholder='Example Password'
                 id='password'
+                onChange={handleChange}
                 />
             </div>
-            <Button gradientDuoTone='purpleToPink' type='submit'>
+            <Button gradientDuoTone='purpleToPink' type='submit' >
               Sign-Up
             </Button>
           </form>
@@ -57,6 +94,13 @@ function SignUp() {
               Sign-In
             </Link>
           </div>
+          {
+            errorMessage && (
+              <Alert className='mt-5' color="failure">
+                {errorMessage}
+              </Alert>
+            )
+          }
         </div>
       </div>
     </div>
