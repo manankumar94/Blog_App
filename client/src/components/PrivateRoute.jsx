@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';  // person is authenticated or not
+import { useSelector } from 'react-redux';  //person is authenticated or not
 import { Outlet, Navigate } from 'react-router-dom';
 
 export default function PrivateRoute() {
